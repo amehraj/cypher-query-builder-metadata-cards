@@ -24,21 +24,24 @@ The application provides the following core capabilities:
 ## Application Workflow
 
 1. The application reads an analysis request from the request configuration.
-2. The query builder inspects the graph schema and determines the shortest valid traversal path between the analysis node and each target node.
-3. The generated MATCH and WHERE clauses are assembled into a complete Cypher query.
-4. The query is executed against Neo4j using the configured database credentials.
-5. The returned records are transformed into plain JSON objects for easy inspection.
+2. The request is checked against the graph schema: the analysis node, each target node, relationship and property must exist in the graph model; anything unknown is refused with an error that lists the valid options.
+3. The query builder determines the shortest valid traversal path from the analysis node to each target node.
+4. The generated MATCH and WHERE clauses are assembled into a complete Cypher query. Target values are passed as query parameters, never written into the query text. Each condition's target node has its own variable, so two conditions can reach the same kind of node (for example two use types, one through the data and one through the model); a hop reached by the same route is shared, so conditions through the same dataset hold on the same dataset.
+5. The query is executed against Neo4j using the configured database credentials. Each matching element is returned once (`RETURN DISTINCT`).
+6. The returned records are transformed into plain JSON objects for easy inspection.
 
 ## Project Structure
 
 - index.js — entry point of the application.
 - queryBuilder.js — constructs the Cypher query from the supplied request.
 - pathFinder.js — resolves graph paths between nodes based on the schema.
-- schema.js — defines the available graph relationships used by the query builder.
+- schema.js — defines the graph relationships and the properties of each node label used by the query builder. The graph model is the one of the metadata card knowledge graph project (a user's assigned user is `ASSIGNED_USER`; card nodes keep their display name in `name`), so the queries also run on graphs built by that project. That project's system links carry validity dates (`valid_from`, `valid_to`); this query builder does not filter on them.
 - request.js — example analysis request used by the application.
-- analysis_requirement_list.js — additional sample analysis requirements.
-- metadata_cards/ — contains metadata card JSON files used to define the knowledge graph content. Users can create these files with their own metadata cards to populate a customized graph in Neo4j.
-- neo4j_data_importer/ — contains a Neo4j import package for loading the graph model and data into Neo4j Aura.
+- analysis_requirement_list.js — ten analysis requirements that combine several node types, each as text and as a request in the request.js format, with the expected answer on the sample graph. Run one with `npm start -- <number>`.
+- tests/ — tests of the query builder (`npm test`).
+- metadata_cards/ — sample metadata cards (one AI model, two datasets, four software components, three software users) for a hospital scenario.
+- graph/seed.cypher — the sample knowledge graph, written by hand from the metadata cards: every node and relationship, with a comment naming the card field it comes from. Values that are a reading of the card rather than a value it names are marked INTERPRETATION.
+- seed.js — loads graph/seed.cypher into the database configured in .env (`npm run seed`).
 
 ## Prerequisites
 
@@ -58,20 +61,20 @@ Follow these steps from start to finish to run the application with Neo4j:
    NEO4J_USERNAME
    NEO4J_PASSWORD
 
-3. Import the sample graph data into Neo4j Aura:
-   - Open your Neo4j Aura instance.
-   - Go to the Import tab.
-   - Upload the zip file from the neo4j_data_importer folder.
-   - Choose the Open model with data option to load the graph model and example data.
-   - The metadata_cards folder contains example metadata cards that are used to define the knowledge graph content. If you want to build your own graph version, create or edit these metadata card files with your own entities and relationships and define your own graph model and data.
+3. Load the sample graph into an empty Neo4j database:
+   npm run seed
 
-4. Define the analysis request in request.js or analysis_requirement_list.js according to the use case you want to test. A sample is already provided in the file. The request object should include:
+   This runs graph/seed.cypher in one transaction against the database in .env and prints how many nodes and relationships the database then holds. Running it again does not duplicate anything. Alternatively, paste graph/seed.cypher into the Query tab of Neo4j Aura or Neo4j Browser.
+
+   The graph is written by hand from the cards in metadata_cards. The cards do not name a software system or its owner, so the file places everything in one system, "TAYS Software System", owned by the organisation TAYS. To build your own graph, edit graph/seed.cypher (or write your own) following the graph model in schema.js.
+
+4. Define the analysis request in request.js according to the use case you want to test. A sample is already provided in the file. The request object should include:
    - analysisNode: the starting node for the query.
    - targets: an array of one or more target conditions.
    - Each target condition should contain:
      - targetNode: the node you want to reach.
-     - targetRelationship: targetNode's final relationship that originates from the analysisNode
-     - targetProperty: the property to compare.
+     - targetRelationship: the relationship that leads into targetNode at the end of the path (optional; without it the shortest path to targetNode is used). If the relationship does not lead into targetNode, the request is refused.
+     - targetProperty: the property to compare (optional; by default the node's value property from the graph model, for example `domain_name` for Domain and `use_type` for Use_Type). It must be a property of targetNode.
      - targetValue: the value to match.
 
 
@@ -95,7 +98,13 @@ Follow these steps from start to finish to run the application with Neo4j:
 5. Start the application:
    npm start
 
-The application will generate the Cypher query, connect to Neo4j, and print the results to the console.
+   To run one of the prepared analysis requirements instead of request.js, give its number from analysis_requirement_list.js:
+   npm start -- 3
+
+The application will generate the Cypher query, print it with its parameters, connect to Neo4j, and print the results to the console.
+
+To run the tests (no database needed):
+   npm test
 
 ## Example Use Case
 
@@ -107,12 +116,8 @@ The application can be used to answer questions such as:
 
 To use the application for a specific analysis scenario, the user must define the corresponding use case in the request configuration file manually. At present, automated conversion from natural language to machine-interpretable requests is not supported.
 
-Before running the application, the graph model and data should first be imported into Neo4j Aura if the user wishes to test the provided example. The zip file in the neo4j_data_importer folder is therefore intended as a sample import package for evaluation purposes. Users are free to define their own graph models and datasets instead, and in that case the schema definition in schema.js should be updated to match the corresponding graph database model and structure.
+Before running the application, load the sample graph with `npm run seed` if you want to test the provided example. You are free to define your own graph model and data instead; in that case, update the schema definition in schema.js to match your graph model.
 
-
-## Disclaimer
-
-Part of the coding for this project was assisted by AI.
 
 ## License
 

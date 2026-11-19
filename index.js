@@ -4,7 +4,21 @@ const neo4j = require("neo4j-driver");
 require("dotenv").config();
 
 const { buildQuery } = require("./queryBuilder");
-const request = require("./request");
+
+// `npm start` runs request.js; `npm start -- <number>` runs that entry of analysis_requirement_list.js.
+function chooseRequest(arg) {
+  if (arg === undefined) {
+    return require("./request");
+  }
+  const entry = require("./analysis_requirement_list").find(r => String(r.id) === arg);
+  if (!entry) {
+    throw new Error(`No analysis requirement ${arg} in analysis_requirement_list.js`);
+  }
+  console.log(`\nAnalysis requirement ${entry.id}: ${entry.requirement}`);
+  return entry.request;
+}
+
+const request = chooseRequest(process.argv[2]);
 
 const driver = neo4j.driver(
   process.env.NEO4J_URI,
@@ -16,7 +30,7 @@ const driver = neo4j.driver(
 
 async function run() {
 
-  const cypher =
+  const { cypher, params } =
     buildQuery(request);
 
   console.log(
@@ -24,12 +38,13 @@ async function run() {
   );
 
   console.log(cypher);
+  console.log("Parameters:", JSON.stringify(params));
 
   try {
     const serverInfo = await driver.getServerInfo();
     console.log(`Connected to Neo4j server version: ${serverInfo.version}`);
 
-    const result = await driver.executeQuery(cypher);
+    const result = await driver.executeQuery(cypher, params);
 
 
     const jsonData = result.records.map(record => {
