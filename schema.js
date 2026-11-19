@@ -53,7 +53,7 @@ const graphEdges = [
 
   {
     from: "Software_User",
-    relationship: "ASSIGNED_DOCTOR",
+    relationship: "ASSIGNED_USER",
     to: "Software_User"
   },
 
@@ -221,6 +221,29 @@ const graphEdges = [
 
 ];
 
+// Properties of each node label. The graph model follows the metadata card knowledge graph project
+// (cardgraph/graph/schema.py): card nodes have a name and an id, and graphs built by that project
+// also a card_id; the sample import package (neo4j_data_importer) uses the same names.
+// The first one listed is the label's value, used when a target names no property.
+const nodeProperties = {
+  AI_Model: ["name", "ai_model_id", "card_id", "model_developer", "training_data_id", "software_system_id"],
+  Data: ["name", "data_id", "card_id", "data_owner", "software_system_id"],
+  Use_Type: ["use_type", "use_type_id"],
+  Domain: ["domain_name", "domain_id"],
+  User_Type: ["user_type", "user_type_id"],
+  Organization: ["organization_name", "organization_id"],
+  Software_System: ["software_system", "software_system_id", "organization_id"],
+  Software_Component: ["name", "software_component_id", "card_id", "software_system_id"],
+  Software_User: ["name", "software_user_id", "card_id", "software_system_id", "assigned_user"],
+  Software_User_Role_Type: ["software_user_role", "software_user_role_type_id"],
+  Bias_Type: ["bias_type", "bias_type_id"],
+  Mitigation_Type: ["mitigation_type", "mitigation_type_id"],
+  Severity: ["severity", "severity_id"],
+  Factor: ["factor", "factor_id"],
+  Function_Type: ["function_type", "function_type_id"]
+};
+
 module.exports = {
-  graphEdges
+  graphEdges,
+  nodeProperties
 };
