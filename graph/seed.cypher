@@ -1,15 +1,12 @@
-// Sample knowledge graph built by hand from the four files in metadata_cards/.
+// Sample knowledge graph built by hand from the five files in metadata_cards/.
 // Graph model: schema.js (same as the metadata card knowledge graph project).
 // Load it with `npm run seed` (database in .env), or paste it into the Neo4j Aura Query tab.
 // Start from an empty database. Every statement uses MERGE, so running the file twice does not
 // duplicate anything.
 //
-// Values are taken from the cards and written in the graph's reference spelling (for example
-// "view_record" -> "View Record"). Lines marked INTERPRETATION are a reading of the card, not a
-// value the card names directly. Not in the cards: the software system and its owner (the TAYS
-// hospital scenario), the users' display names, and validity dates of system links.
 
 // ---- organisations and the software system ------------------------------------------------
+// system_1 (system_cards.json): name, organization
 MERGE (o:Organization {organization_id: "organization_tays"}) SET o.organization_name = "TAYS";
 MERGE (o:Organization {organization_id: "organization_nvidia"}) SET o.organization_name = "NVIDIA";       // model_1 model_details.provider
 MERGE (o:Organization {organization_id: "organization_google"}) SET o.organization_name = "Google";       // data_2 authorship.publisher google_llc
@@ -46,7 +43,6 @@ MERGE (f5:Factor {factor: "Software"}) MERGE (m)-[:AI_MODEL_RISK_FACTOR]->(f5);
 // safety.measures (encrypted weights, hardware-bound deployment)
 MATCH (m:AI_Model {ai_model_id: "ai_model_model_1"})
 MERGE (x:Mitigation_Type {mitigation_type: "Security hardening"}) MERGE (m)-[:AI_MODEL_RISK_MITIGATION_TYPE]->(x);
-// training_data.dataset is Multi-PIE, which has no data card here: no TRAINED_ON relationship.
 
 // ---- data_1: Patient Records (data_cards.json) ---------------------------------------------
 MERGE (d:Data {data_id: "data_data_1"}) SET d.card_id = "data_1", d.name = "Patient Records";
@@ -97,6 +93,10 @@ MERGE (x2:Use_Type {use_type: "Age Classification"})    MERGE (d)-[:DATA_MISUSE_
 MATCH (d:Data {data_id: "data_data_2"})
 MERGE (b:Bias_Type {bias_type: "Selection/Sampling"}) MERGE (d)-[:DATA_BIAS_TYPE]->(b)
 MERGE (f:Factor {factor: "Bias-related"})             MERGE (d)-[:DATA_RISK_FACTOR]->(f);
+// SCENARIO ASSUMPTION (not in any card): in the hospital scenario the EmotionNet model is further trained
+// on this image dataset. The model card itself names Multi-PIE as its training data.
+MATCH (m:AI_Model {ai_model_id: "ai_model_model_1"}), (d:Data {data_id: "data_data_2"})
+MERGE (m)-[:TRAINED_ON]->(d);
 
 // ---- software components (component_cards.json) --------------------------------------------
 MERGE (c:Software_Component {software_component_id: "software_component_component_1"}) SET c.card_id = "component_1", c.name = "View Record Component";
@@ -151,6 +151,7 @@ MERGE (u3)-[:ASSIGNED_USER]->(u3);
 // user_2's assigned_patient (user_1) has no relationship of its own in the graph model.
 
 // ---- what the system uses ------------------------------------------------------------------
+// system_1 (system_cards.json): ai_models, data_sources, components, users
 MATCH (s:Software_System {software_system_id: "software_system_tays"})
 MATCH (m:AI_Model {ai_model_id: "ai_model_model_1"})
 MATCH (d1:Data {data_id: "data_data_1"}), (d2:Data {data_id: "data_data_2"})
