@@ -39,7 +39,7 @@ The application provides the following core capabilities:
 - request.js — example analysis request used by the application.
 - analysis_requirement_list.js — ten analysis requirements that combine several node types, each as text and as a request in the request.js format, with the expected answer on the sample graph. Run one with `npm start -- <number>`.
 - tests/ — tests of the query builder (`npm test`).
-- metadata_cards/ — sample metadata cards (one AI model, two datasets, four software components, three software users) for a hospital scenario.
+- metadata_cards/ — sample metadata cards (one software system, one AI model, two datasets, four software components, three software users) for a hospital scenario. The system card names the system, its owner and the models, datasets, components and users it consists of.
 - graph/seed.cypher — the sample knowledge graph, written by hand from the metadata cards: every node and relationship, with a comment naming the card field it comes from. Values that are a reading of the card rather than a value it names are marked INTERPRETATION.
 - seed.js — loads graph/seed.cypher into the database configured in .env (`npm run seed`).
 
@@ -66,7 +66,7 @@ Follow these steps from start to finish to run the application with Neo4j:
 
    This runs graph/seed.cypher in one transaction against the database in .env and prints how many nodes and relationships the database then holds. Running it again does not duplicate anything. Alternatively, paste graph/seed.cypher into the Query tab of Neo4j Aura or Neo4j Browser.
 
-   The graph is written by hand from the cards in metadata_cards. The cards do not name a software system or its owner, so the file places everything in one system, "TAYS Software System", owned by the organisation TAYS. To build your own graph, edit graph/seed.cypher (or write your own) following the graph model in schema.js.
+   The graph is written by hand from the cards in metadata_cards. The system card places everything in one system, "TAYS Software System", owned by the organisation TAYS. To build your own graph, edit graph/seed.cypher (or write your own) following the graph model in schema.js.
 
 4. Define the analysis request in request.js according to the use case you want to test. A sample is already provided in the file. The request object should include:
    - analysisNode: the starting node for the query.
