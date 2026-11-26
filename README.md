@@ -16,7 +16,7 @@ The application provides the following core capabilities:
 
 - Generates Cypher queries dynamically from analysis requirements.
 - Builds traversal paths across a predefined graph schema of software and AI-related entities.
-- Supports one or more target conditions in a single request.
+- Supports one or more conditions in a single request.
 - Resolves relationships such as data risk, intended use, domain relevance, and access paths.
 - Connects to a Neo4j database, executes the generated query, and returns the results in a readable JSON format.
 - Enables analysis of metadata cards through a graph-based representation rather than static tables.
@@ -70,8 +70,8 @@ Follow these steps from start to finish to run the application with Neo4j:
 
 4. Define the analysis request in request.js according to the use case you want to test. A sample is already provided in the file. The request object should include:
    - analysisNode: the starting node for the query.
-   - targets: an array of one or more target conditions.
-   - Each target condition should contain:
+   - conditions: an array of one or more conditions.
+   - Each condition should contain:
      - targetNode: the node you want to reach.
      - targetRelationship: the relationship that leads into targetNode at the end of the path (optional; without it the shortest path to targetNode is used). If the relationship does not lead into targetNode, the request is refused.
      - targetProperty: the property to compare (optional; by default the node's value property from the graph model, for example `domain_name` for Domain and `use_type` for Use_Type). It must be a property of targetNode.
@@ -82,7 +82,7 @@ Follow these steps from start to finish to run the application with Neo4j:
    ```js
    const request = {
      analysisNode: "Software_System",
-     targets: [
+     conditions: [
        {
          targetNode: "Severity",
          targetRelationship: "DATA_RISK_SEVERITY",
@@ -93,7 +93,7 @@ Follow these steps from start to finish to run the application with Neo4j:
    };
    ```
 
-   In this example, the application starts from the Software_System node, then looks for a path to the Severity node using the relationship DATA_RISK_SEVERITY. It then filters the result so that the severity property equals High. You can extend the targets array with additional conditions if you want to combine multiple constraints in one query.
+   In this example, the application starts from the Software_System node, then looks for a path to the Severity node using the relationship DATA_RISK_SEVERITY. It then filters the result so that the severity property equals High. You can extend the conditions array with additional conditions if you want to combine multiple constraints in one query.
 
 5. Start the application:
    npm start

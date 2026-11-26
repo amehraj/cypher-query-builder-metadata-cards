@@ -21,7 +21,7 @@ const analysisRequirements = [
     nodeTypes: ["Software_System", "AI_Model", "Data", "Use_Type", "User_Type", "Domain"],
     request: {
       analysisNode: "Software_System",
-      targets: [
+      conditions: [
         { targetNode: "Use_Type", targetRelationship: "AI_MODEL_INTENDED_USE_TYPE", targetValue: "Emotion Classification" },
         { targetNode: "User_Type", targetRelationship: "AI_MODEL_INTENDED_USER", targetValue: "Developer" },
         { targetNode: "Use_Type", targetRelationship: "DATA_INTENDED_USE_TYPE", targetValue: "Medical Diagnosis" },
@@ -38,7 +38,7 @@ const analysisRequirements = [
     nodeTypes: ["Software_System", "AI_Model", "Data", "Factor", "Mitigation_Type", "Severity"],
     request: {
       analysisNode: "Software_System",
-      targets: [
+      conditions: [
         { targetNode: "Factor", targetRelationship: "AI_MODEL_RISK_FACTOR", targetValue: "Misclassification" },
         { targetNode: "Mitigation_Type", targetRelationship: "AI_MODEL_RISK_MITIGATION_TYPE", targetValue: "Security hardening" },
         { targetNode: "Severity", targetRelationship: "DATA_RISK_SEVERITY", targetValue: "High" },
@@ -50,12 +50,12 @@ const analysisRequirements = [
   {
     id: 3,
     requirement:
-      "Which organisations own data that is intended for person detection, has a sampling bias, and must not " +
-      "be used for gender classification?",
+      "Which organisations own data that is intended for person detection, has a sampling bias, and whose " +
+      "card lists gender classification as a misuse?",
     nodeTypes: ["Organization", "Data", "Use_Type", "Bias_Type"],
     request: {
       analysisNode: "Organization",
-      targets: [
+      conditions: [
         { targetNode: "Use_Type", targetRelationship: "DATA_INTENDED_USE_TYPE", targetValue: "Person Detection" },
         { targetNode: "Bias_Type", targetRelationship: "DATA_BIAS_TYPE", targetValue: "Selection/Sampling" },
         { targetNode: "Use_Type", targetRelationship: "DATA_MISUSE_TYPE", targetValue: "Gender Classification" }
@@ -66,12 +66,12 @@ const analysisRequirements = [
   {
     id: 4,
     requirement:
-      "Which software systems use one dataset that both has a sampling bias and must not be used for " +
-      "educational model training?",
+      "Which software systems use one dataset that both has a sampling bias and lists educational model " +
+      "training as a misuse?",
     nodeTypes: ["Software_System", "Data", "Bias_Type", "Use_Type"],
     request: {
       analysisNode: "Software_System",
-      targets: [
+      conditions: [
         { targetNode: "Bias_Type", targetRelationship: "DATA_BIAS_TYPE", targetValue: "Selection/Sampling" },
         { targetNode: "Use_Type", targetRelationship: "DATA_MISUSE_TYPE", targetValue: "Educational model training" }
       ]
@@ -88,7 +88,7 @@ const analysisRequirements = [
     nodeTypes: ["Software_Component", "Function_Type", "Data", "Use_Type"],
     request: {
       analysisNode: "Software_Component",
-      targets: [
+      conditions: [
         { targetNode: "Function_Type", targetRelationship: "HAS_FUNCTION", targetValue: "Insert Record" },
         { targetNode: "Function_Type", targetRelationship: "HAS_FUNCTION", targetValue: "Check Data Consent" },
         { targetNode: "Use_Type", targetRelationship: "DATA_INTENDED_USE_TYPE", targetValue: "Clinical Decision Support" }
@@ -104,7 +104,7 @@ const analysisRequirements = [
     nodeTypes: ["Software_Component", "AI_Model", "Factor", "Domain"],
     request: {
       analysisNode: "Software_Component",
-      targets: [
+      conditions: [
         { targetNode: "Factor", targetRelationship: "AI_MODEL_RISK_FACTOR", targetValue: "Misuse" },
         { targetNode: "Domain", targetRelationship: "AI_MODEL_INTENDED_USE_DOMAIN", targetValue: "Facial Emotion Recognition" }
       ]
@@ -119,7 +119,7 @@ const analysisRequirements = [
     nodeTypes: ["Software_User_Role_Type", "Software_Component", "Function_Type", "Data", "Severity", "Factor"],
     request: {
       analysisNode: "Software_User_Role_Type",
-      targets: [
+      conditions: [
         { targetNode: "Function_Type", targetRelationship: "HAS_FUNCTION", targetValue: "View Record" },
         { targetNode: "Severity", targetRelationship: "DATA_RISK_SEVERITY", targetValue: "High" },
         { targetNode: "Factor", targetRelationship: "DATA_RISK_FACTOR", targetValue: "Privacy" }
@@ -135,7 +135,7 @@ const analysisRequirements = [
     nodeTypes: ["Software_User_Role_Type", "Software_Component", "AI_Model", "Use_Type", "Factor"],
     request: {
       analysisNode: "Software_User_Role_Type",
-      targets: [
+      conditions: [
         { targetNode: "Use_Type", targetRelationship: "AI_MODEL_INTENDED_USE_TYPE", targetValue: "Emotion Classification" },
         { targetNode: "Factor", targetRelationship: "AI_MODEL_RISK_FACTOR", targetValue: "Misclassification" }
       ]
@@ -150,7 +150,7 @@ const analysisRequirements = [
     nodeTypes: ["Software_System", "Software_User", "Software_User_Role_Type", "Software_Component", "Function_Type", "Data", "User_Type"],
     request: {
       analysisNode: "Software_System",
-      targets: [
+      conditions: [
         { targetNode: "Software_User_Role_Type", targetRelationship: "SOFTWARE_USER_ROLE_TYPE_OF", targetValue: "Doctor" },
         { targetNode: "Function_Type", targetRelationship: "HAS_FUNCTION", targetValue: "Use AI Model" },
         { targetNode: "User_Type", targetRelationship: "DATA_INTENDED_USER", targetValue: "Doctor" }
@@ -166,7 +166,7 @@ const analysisRequirements = [
     nodeTypes: ["Organization", "AI_Model", "Mitigation_Type", "Factor"],
     request: {
       analysisNode: "Organization",
-      targets: [
+      conditions: [
         { targetNode: "Mitigation_Type", targetRelationship: "AI_MODEL_BIAS_MITIGATION_TYPE", targetValue: "Excluding Attributes" },
         { targetNode: "Factor", targetRelationship: "AI_MODEL_RISK_FACTOR", targetValue: "Hardware" }
       ]
