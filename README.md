@@ -66,7 +66,7 @@ Follow these steps from start to finish to run the application with Neo4j:
 
    This runs graph/seed.cypher in one transaction against the database in .env and prints how many nodes and relationships the database then holds. Running it again does not duplicate anything. Alternatively, paste graph/seed.cypher into the Query tab of Neo4j Aura or Neo4j Browser.
 
-   The graph is written by hand from the cards in metadata_cards. The system card places everything in one system, "TAYS Software System", owned by the organisation TAYS. To build your own graph, edit graph/seed.cypher (or write your own) following the graph model in schema.js.
+   The graph is written by hand from the cards in metadata_cards. The system card places everything in one system, "Hospital Software System". To build your own graph, edit graph/seed.cypher (or write your own) following the graph model in schema.js.
 
 4. Define the analysis request in request.js according to the use case you want to test. A sample is already provided in the file. The request object should include:
    - analysisNode: the starting node for the query.
@@ -105,6 +105,14 @@ The application will generate the Cypher query, print it with its parameters, co
 
 To run the tests (no database needed):
    npm test
+
+## Sample Graph
+
+The sample graph after `npm run seed` (58 nodes, 71 relationships), as shown in Neo4j: the Hospital Software System
+in the centre, with its components, users and roles (top right), the EmotionNet model (left), and the Patient Records
+(right) and Open Images Extended MIAP (bottom) datasets, each with the values its card reports.
+
+![Sample knowledge graph of the hospital scenario](graph/sample_graph.png)
 
 ## Example Use Case
 
