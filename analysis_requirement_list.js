@@ -28,7 +28,7 @@ const analysisRequirements = [
         { targetNode: "Domain", targetRelationship: "DATA_INTENDED_USE_DOMAIN", targetValue: "Healthcare" }
       ]
     },
-    expected: ["TAYS Software System"]
+    expected: ["Hospital Software System"]
   },
   {
     id: 2,
@@ -45,7 +45,7 @@ const analysisRequirements = [
         { targetNode: "Mitigation_Type", targetRelationship: "DATA_RISK_MITIGATION_TYPE", targetValue: "Privacy protection" }
       ]
     },
-    expected: ["TAYS Software System"]
+    expected: ["Hospital Software System"]
   },
   {
     id: 3,
@@ -130,14 +130,14 @@ const analysisRequirements = [
   {
     id: 8,
     requirement:
-      "Which user roles can access a component that uses an AI model whose bias is mitigated by excluding " +
-      "attributes and whose users include ML engineers?",
-    nodeTypes: ["Software_User_Role_Type", "Software_Component", "AI_Model", "Mitigation_Type", "User_Type"],
+      "Which user roles can use an emotion classification model that lists misclassification as a risk factor? " +
+      "Users in these roles see the model's output and must be able to recognise its errors.",
+    nodeTypes: ["Software_User_Role_Type", "Software_Component", "AI_Model", "Use_Type", "Factor"],
     request: {
       analysisNode: "Software_User_Role_Type",
       targets: [
-        { targetNode: "Mitigation_Type", targetRelationship: "AI_MODEL_BIAS_MITIGATION_TYPE", targetValue: "Excluding Attributes" },
-        { targetNode: "User_Type", targetRelationship: "AI_MODEL_INTENDED_USER", targetValue: "ML Engineer" }
+        { targetNode: "Use_Type", targetRelationship: "AI_MODEL_INTENDED_USE_TYPE", targetValue: "Emotion Classification" },
+        { targetNode: "Factor", targetRelationship: "AI_MODEL_RISK_FACTOR", targetValue: "Misclassification" }
       ]
     },
     expected: ["Doctor"]
@@ -156,7 +156,7 @@ const analysisRequirements = [
         { targetNode: "User_Type", targetRelationship: "DATA_INTENDED_USER", targetValue: "Doctor" }
       ]
     },
-    expected: ["TAYS Software System"]
+    expected: ["Hospital Software System"]
   },
   {
     id: 10,

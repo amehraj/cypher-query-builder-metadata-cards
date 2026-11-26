@@ -2,8 +2,8 @@
   "system_cards": [
     {
       "id": "system_1",
-      "name": "TAYS Software System",
-      "organization": "TAYS",
+      "name": "Hospital Software System",
+      "organization": "Hospital",
       "ai_models": ["model_1"],
       "data_sources": ["data_1", "data_2"],
       "components": ["component_1", "component_2", "component_3", "component_4"],
