@@ -1,5 +1,5 @@
 // Sample knowledge graph built by hand from the five files in metadata_cards/.
-// Graph model: schema.js (same as the metadata card knowledge graph project).
+// Graph model: graphModel.js (same as the metadata card knowledge graph project).
 // Load it with `npm run seed` (database in .env), or paste it into the Neo4j Aura Query tab.
 // Start from an empty database. Every statement uses MERGE, so running the file twice does not
 // duplicate anything.

@@ -1,4 +1,4 @@
-const { graphEdges } = require("./schema");
+const { graphEdges } = require("./graphModel");
 
 function findPath(startNode, analysisNode) {
 
@@ -44,12 +44,12 @@ function findPath(startNode, analysisNode) {
 }
 
 function findOutgoingEdge(fromNode, relationship) {
-  const { graphEdges } = require("./schema");
+  const { graphEdges } = require("./graphModel");
   return graphEdges.find(e => e.from === fromNode && e.relationship === relationship) || null;
 }
 
 function findPathToNodeWithOutgoingRelationship(startNode, relationship, relTargetNode) {
-  const { graphEdges } = require("./schema");
+  const { graphEdges } = require("./graphModel");
 
   const queue = [
     {
