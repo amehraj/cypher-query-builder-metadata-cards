@@ -144,11 +144,10 @@ MERGE (doctor:Software_User_Role_Type {software_user_role: "Doctor"})
 MERGE (u1)-[:SOFTWARE_USER_ROLE_TYPE_OF]->(patient)
 MERGE (u2)-[:SOFTWARE_USER_ROLE_TYPE_OF]->(doctor)
 MERGE (u3)-[:SOFTWARE_USER_ROLE_TYPE_OF]->(patient)
-// assigned_user: user_1 -> user_2. user_3's card names itself (user_3) as its assigned user, which
-// looks like a typo for user_2; it is kept as the card states.
+// assigned_user: both patients (user_1, user_3) are assigned to the doctor (user_2).
 MERGE (u1)-[:ASSIGNED_USER]->(u2)
-MERGE (u3)-[:ASSIGNED_USER]->(u3);
-// user_2's assigned_patient (user_1) has no relationship of its own in the graph model.
+MERGE (u3)-[:ASSIGNED_USER]->(u2);
+// user_2's assigned_patient (user_1, user_3) is the same relationship seen from the doctor; no extra edge.
 
 // ---- what the system uses ------------------------------------------------------------------
 // system_1 (system_cards.json): ai_models, data_sources, components, users

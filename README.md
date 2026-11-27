@@ -109,8 +109,9 @@ To run the tests (no database needed):
 ## Sample Graph
 
 The sample graph after `npm run seed` (58 nodes, 71 relationships), as shown in Neo4j: the Hospital Software System
-in the centre, with its components, users and roles (top right), the EmotionNet model (left), and the Patient Records
-(right) and Open Images Extended MIAP (bottom) datasets, each with the values its card reports.
+in the centre, with its components, users and roles (top), the EmotionNet model (bottom left), and the Patient Records
+(right) and Open Images Extended MIAP (bottom) datasets, each with the values its card reports. Both patients are
+assigned to the doctor.
 
 ![Sample knowledge graph of the hospital scenario](graph/sample_graph.png)
 
