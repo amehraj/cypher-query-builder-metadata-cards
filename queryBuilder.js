@@ -24,25 +24,17 @@ function resolveProperty(label, property) {
 }
 
 function buildQuery(request) {
-  const {
-    analysisNode,
-    targetNode,
-    targetProperty,
-    targetValue,
-    targetRelationship,
-    targets
-  } = request;
+  const { analysisNode, conditions } = request;
 
-  const targetConditions = Array.isArray(targets) && targets.length
-    ? targets
-    : [{ targetNode, targetProperty, targetValue, targetRelationship }];
-
+  if (!Array.isArray(conditions) || conditions.length === 0) {
+    throw new Error("A request needs a non-empty conditions array");
+  }
   if (!analysisNode) {
     throw new Error("An analysisNode is required to build a query");
   }
   checkLabel(analysisNode, "analysisNode");
 
-  const resolvedTargets = targetConditions.map((condition) => {
+  const resolvedTargets = conditions.map((condition) => {
     const {
       targetNode: conditionTargetNode,
       targetProperty: conditionTargetProperty,

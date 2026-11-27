@@ -6,7 +6,7 @@ const { buildQuery } = require('../queryBuilder');
 test('buildQuery supports multiple target conditions with AND clauses', () => {
   const { cypher, params } = buildQuery({
     analysisNode: 'Software_System',
-    targets: [
+    conditions: [
       {
         targetNode: 'Severity',
         targetRelationship: 'DATA_RISK_SEVERITY',
@@ -36,7 +36,7 @@ test('buildQuery supports multiple target conditions with AND clauses', () => {
 test('conditions ending at the same label get their own variables', () => {
   const { cypher } = buildQuery({
     analysisNode: 'Software_System',
-    targets: [
+    conditions: [
       { targetNode: 'Use_Type', targetRelationship: 'DATA_INTENDED_USE_TYPE', targetValue: 'Medical Diagnosis' },
       { targetNode: 'Use_Type', targetRelationship: 'AI_MODEL_INTENDED_USE_TYPE', targetValue: 'Emotion Classification' }
     ]
@@ -50,7 +50,7 @@ test('conditions ending at the same label get their own variables', () => {
 test('conditions through the same route share that hop (the same dataset)', () => {
   const { cypher } = buildQuery({
     analysisNode: 'Software_System',
-    targets: [
+    conditions: [
       { targetNode: 'Severity', targetRelationship: 'DATA_RISK_SEVERITY', targetValue: 'High' },
       { targetNode: 'Use_Type', targetRelationship: 'DATA_INTENDED_USE_TYPE', targetValue: 'Medical Diagnosis' }
     ]
@@ -63,7 +63,7 @@ test('values are parameters, never part of the query text', () => {
   const tricky = 'High\\" OR true //';
   const { cypher, params } = buildQuery({
     analysisNode: 'Software_System',
-    targets: [{ targetNode: 'Severity', targetRelationship: 'DATA_RISK_SEVERITY', targetValue: tricky }]
+    conditions: [{ targetNode: 'Severity', targetRelationship: 'DATA_RISK_SEVERITY', targetValue: tricky }]
   });
   assert.ok(!cypher.includes('OR true'));
   assert.equal(params.value0, tricky);
@@ -71,19 +71,21 @@ test('values are parameters, never part of the query text', () => {
 
 test('unknown labels, relationships and properties are refused', () => {
   const base = { analysisNode: 'Software_System' };
-  assert.throws(() => buildQuery({ ...base, targets: [{ targetNode: 'Severity) DETACH DELETE (x', targetValue: 'High' }] }), /Unknown targetNode/);
-  assert.throws(() => buildQuery({ analysisNode: 'Nope', targets: [{ targetNode: 'Severity', targetValue: 'High' }] }), /Unknown analysisNode/);
-  assert.throws(() => buildQuery({ ...base, targets: [{ targetNode: 'Severity', targetRelationship: 'NOT_A_REL', targetValue: 'High' }] }), /Unknown targetRelationship/);
-  assert.throws(() => buildQuery({ ...base, targets: [{ targetNode: 'Domain', targetProperty: 'domain', targetValue: 'x' }] }), /not a property of Domain/);
+  assert.throws(() => buildQuery({ ...base, conditions: [{ targetNode: 'Severity) DETACH DELETE (x', targetValue: 'High' }] }), /Unknown targetNode/);
+  assert.throws(() => buildQuery({ analysisNode: 'Software_System', targets: [{ targetNode: 'Severity', targetValue: 'High' }] }), /non-empty conditions array/);
+  assert.throws(() => buildQuery({ analysisNode: 'Software_System', conditions: [] }), /non-empty conditions array/);
+  assert.throws(() => buildQuery({ analysisNode: 'Nope', conditions: [{ targetNode: 'Severity', targetValue: 'High' }] }), /Unknown analysisNode/);
+  assert.throws(() => buildQuery({ ...base, conditions: [{ targetNode: 'Severity', targetRelationship: 'NOT_A_REL', targetValue: 'High' }] }), /Unknown targetRelationship/);
+  assert.throws(() => buildQuery({ ...base, conditions: [{ targetNode: 'Domain', targetProperty: 'domain', targetValue: 'x' }] }), /not a property of Domain/);
   // a relationship that exists but does not lead to the target node is an error, not a silent other path
-  assert.throws(() => buildQuery({ ...base, targets: [{ targetNode: 'Severity', targetRelationship: 'DATA_INTENDED_USE_TYPE', targetValue: 'High' }] }), /No path/);
+  assert.throws(() => buildQuery({ ...base, conditions: [{ targetNode: 'Severity', targetRelationship: 'DATA_INTENDED_USE_TYPE', targetValue: 'High' }] }), /No path/);
 });
 
 // Issue 4: the property defaults to the label's value property from the graph model.
 test('the property defaults to the label value property', () => {
   const { cypher } = buildQuery({
     analysisNode: 'AI_Model',
-    targets: [{ targetNode: 'Domain', targetRelationship: 'AI_MODEL_INTENDED_USE_DOMAIN', targetValue: 'Healthcare' }]
+    conditions: [{ targetNode: 'Domain', targetRelationship: 'AI_MODEL_INTENDED_USE_DOMAIN', targetValue: 'Healthcare' }]
   });
   assert.match(cypher, /\.domain_name = \$value0/);
 });
@@ -92,13 +94,13 @@ test('the property defaults to the label value property', () => {
 test('the graph model uses ASSIGNED_USER and card names in name', () => {
   const { cypher } = buildQuery({
     analysisNode: 'Software_User',
-    targets: [{ targetNode: 'Software_User', targetRelationship: 'ASSIGNED_USER', targetValue: 'Doctor 1' }]
+    conditions: [{ targetNode: 'Software_User', targetRelationship: 'ASSIGNED_USER', targetValue: 'Doctor 1' }]
   });
   assert.match(cypher, /\[:ASSIGNED_USER\]->\(\w+:Software_User\)/);
   assert.match(cypher, /\.name = \$value0/);
   assert.throws(() => buildQuery({
     analysisNode: 'Software_User',
-    targets: [{ targetNode: 'Software_User', targetRelationship: 'ASSIGNED_DOCTOR', targetValue: 'x' }]
+    conditions: [{ targetNode: 'Software_User', targetRelationship: 'ASSIGNED_DOCTOR', targetValue: 'x' }]
   }), /Unknown targetRelationship/);
 });
 
@@ -108,7 +110,7 @@ test('every entry of analysis_requirement_list.js builds a query', () => {
   for (const entry of list) {
     assert.ok(entry.requirement && Array.isArray(entry.expected), `entry ${entry.id}`);
     const { cypher, params } = buildQuery(entry.request);
-    assert.equal(Object.keys(params).length, entry.request.targets.length, `entry ${entry.id}`);
+    assert.equal(Object.keys(params).length, entry.request.conditions.length, `entry ${entry.id}`);
     assert.match(cypher, /RETURN DISTINCT/);
   }
 });
