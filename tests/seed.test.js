@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const { statements } = require('../seed');
-const { graphEdges, nodeProperties } = require('../schema');
+const { graphEdges, nodeProperties } = require('../graphModel');
 
 const text = fs.readFileSync(path.join(__dirname, '..', 'graph', 'seed.cypher'), 'utf8');
 const queries = statements(text);

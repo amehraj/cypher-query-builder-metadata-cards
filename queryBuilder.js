@@ -1,11 +1,11 @@
 const { findPath, findPathToNodeWithOutgoingRelationship } = require("./pathFinder");
-const { graphEdges, nodeProperties } = require("./schema");
+const { graphEdges, nodeProperties } = require("./graphModel");
 
 const LABELS = new Set(Object.keys(nodeProperties));
 const RELATIONSHIPS = new Set(graphEdges.map(edge => edge.relationship));
 
 // Labels and relationship types cannot be query parameters, so they are checked against the
-// schema before they are written into the query; values always travel as parameters.
+// graph model before they are written into the query; values always travel as parameters.
 function checkLabel(label, role) {
   if (!LABELS.has(label)) {
     throw new Error(`Unknown ${role} "${label}". Known labels: ${[...LABELS].join(", ")}`);
